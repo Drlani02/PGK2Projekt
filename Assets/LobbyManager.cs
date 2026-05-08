@@ -10,15 +10,17 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 
-public class LobbyManager : MonoBehaviour
+public class LobbyManager : NetworkBehaviour
 {
     public TextMeshProUGUI JoinCodeText;
     public TMP_InputField JoinCodeInputField;
+    public TextMeshProUGUI timerText;
     public GameObject StartButton;
     public GameObject PlayerPrefab;
     private int playersCount = 0;
-    public NetworkVariable<float> timePlayer1 = new NetworkVariable<float>(60f);
-    public NetworkVariable<float> timePlayer2 = new NetworkVariable<float>(60f);
+    public int currentRound = 1;
+    public NetworkVariable<float> timePlayer1 = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> timePlayer2 = new NetworkVariable<float>(0f);
     public async Task Authenticate()
     {
         await UnityServices.InitializeAsync();
@@ -88,9 +90,75 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+    public void CatchRunner()
+    {
+        PlayerState[] players = FindObjectsByType<PlayerState>();
+        currentRound++;
+        if (currentRound == 2)
+        {
+            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+            int spawnIndex = Random.Range(0, spawnPoints.Length);
+            foreach (PlayerState player in players)
+            {
+                if(player.CurrentRole.Value == PlayerState.PlayerRoleEnum.Hunter)
+                {
+                    player.CurrentRole.Value = PlayerState.PlayerRoleEnum.Runner;
+                    if(spawnIndex < spawnPoints.Length)
+                    {
+                        if(spawnIndex == 1)
+                            player.transform.position = spawnPoints[1].transform.position;
+                        else if(spawnIndex == 0)
+                            player.transform.position = spawnPoints[0].transform.position;
+                    }
+                }
+                else
+                {
+                    player.CurrentRole.Value = PlayerState.PlayerRoleEnum.Hunter;
+                    if(spawnIndex < spawnPoints.Length)
+                    {
+                        if (spawnIndex == 1)
+                            player.transform.position = spawnPoints[0].transform.position;
+                        else if (spawnIndex == 0)
+                            player.transform.position = spawnPoints[1].transform.position;
+                    }
+                }
+            }
+        }
+        else if (currentRound == 3)
+        {
+            if(timePlayer1.Value > timePlayer2.Value)
+            {
+                Debug.Log("Player 1 wins!");
+            }
+            else if (timePlayer2.Value > timePlayer1.Value)
+            {
+                Debug.Log("Player 2 wins!");
+            }
+            else
+            {
+                Debug.Log("It's a tie!");
+            }
+        }
+    }
+
     public async void Start()
     {
         
         await Authenticate();
     }
+
+    public void Update()
+    {
+        if(currentRound == 1) timerText.text = $"Round 1: Player 1 Time: {timePlayer1.Value:F2} seconds";
+        else if (currentRound == 2) timerText.text = $"Round 2: Player 2 Time: {timePlayer2.Value:F2} seconds";
+        if (!IsServer) return;
+        if(currentRound == 1)
+        {
+            timePlayer1.Value += Time.deltaTime;
+        }
+        if (currentRound == 2)
+        {
+            timePlayer2.Value += Time.deltaTime;
+        }
+     }
 }

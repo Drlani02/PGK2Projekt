@@ -30,14 +30,13 @@ public class PlayerState : NetworkBehaviour
             playerCollider.enabled = true;
             otherPlayer.CurrentRole.Value = PlayerRoleEnum.Hunter;
             otherPlayer.playerCollider.enabled = false;
-
         }
     }
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            PlayerState otherPlayerState = collision.gameObject.GetComponent<PlayerState>();
+            PlayerState otherPlayerState = other.GetComponent<PlayerState>();
             if (otherPlayerState != null)
             {
                 PlayerColided(otherPlayerState);
@@ -47,7 +46,7 @@ public class PlayerState : NetworkBehaviour
 
     void Start()
     {
-        
+        playerCollider = GetComponent<Collider>();
     }
     void Update()
     {
