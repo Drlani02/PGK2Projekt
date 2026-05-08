@@ -6,6 +6,7 @@ TagManager:
   tags:
   - SpeedBoost
   - JumpBoost
+  - SpawnPoint
   layers:
   - Default
   - TransparentFX
