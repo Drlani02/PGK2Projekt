@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8681350323572602935}
   - component: {fileID: 1877584108253204041}
   - component: {fileID: 1714224208318277162}
+  - component: {fileID: -4967048761375965064}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -214,6 +215,24 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-4967048761375965064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971718249793593956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcd727cc4c02e4a4994ba599c9677dcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerState
+  ShowTopMostFoldoutHeaderGroup: 1
+  CurrentRole:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 1
 --- !u!1 &8143255756873339928
 GameObject:
   m_ObjectHideFlags: 0

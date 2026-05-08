@@ -16,6 +16,9 @@ public class LobbyManager : MonoBehaviour
     public TMP_InputField JoinCodeInputField;
     public GameObject StartButton;
     public GameObject PlayerPrefab;
+    private int playersCount = 0;
+    public NetworkVariable<float> timePlayer1 = new NetworkVariable<float>(60f);
+    public NetworkVariable<float> timePlayer2 = new NetworkVariable<float>(60f);
     public async Task Authenticate()
     {
         await UnityServices.InitializeAsync();
@@ -74,6 +77,13 @@ public class LobbyManager : MonoBehaviour
                 GameObject playerInstance = Instantiate(PlayerPrefab, selectedSpawn.position, selectedSpawn.rotation);
                 NetworkObject playerNetworkObject = playerInstance.GetComponent<NetworkObject>();
                 playerNetworkObject.SpawnWithOwnership(sceneEvent.ClientId);
+                playersCount++;
+                if (playersCount == 2)
+                {
+                    int randomHunterIndex = Random.Range(0, 2);
+                    GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+                    playerObjects[randomHunterIndex].GetComponent<PlayerState>().CurrentRole.Value = PlayerState.PlayerRoleEnum.Hunter;
+                }
             }
         }
     }
