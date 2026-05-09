@@ -15,6 +15,7 @@ public class LobbyManager : NetworkBehaviour
     public TextMeshProUGUI JoinCodeText;
     public TMP_InputField JoinCodeInputField;
     public GameObject StartButton;
+    public GameObject JoinText;
     public GameObject PlayerPrefab;
     private int playersCount = 0;
     public int currentRound = 1;
@@ -39,6 +40,7 @@ public class LobbyManager : NetworkBehaviour
 
     public async Task JoinGame(string joinCode)
     {
+        JoinText.SetActive(true);
         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
         RelayServerData relayServerData = AllocationUtils.ToRelayServerData(joinAllocation, "dtls");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);

@@ -77,7 +77,7 @@ public class GameManager : NetworkBehaviour
         }
         else if (currentRound.Value == 3)
         {
-            string msg = (timePlayer1.Value < timePlayer2.Value) ? "Player 1 Wins!" : "Player 2 Wygrywa!";
+            string msg = (timePlayer1.Value < timePlayer2.Value) ? "Player 1 Wins!" : "Player 2 Wins!";
 
             PrepareResultClientRpc(msg);
 
