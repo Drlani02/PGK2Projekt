@@ -2,6 +2,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameManager : NetworkBehaviour
 {
@@ -10,7 +11,7 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<int> currentRound = new NetworkVariable<int>(1);
     public NetworkVariable<float> timePlayer1 = new NetworkVariable<float>(0f);
     public NetworkVariable<float> timePlayer2 = new NetworkVariable<float>(0f);
-
+    public GameObject[] powerupPrefabs;
     [SerializeField] private TextMeshProUGUI timerTextP1;
     [SerializeField] private TextMeshProUGUI timerTextP2;
     [SerializeField] private float catchCooldown = 2f;
@@ -92,6 +93,18 @@ public class GameManager : NetworkBehaviour
             ResultManager.Instance.SetWinner(message);
         }
     }
+
+    private IEnumerator SpawnPowerupsRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5f);
+            Vector3 spawnPosition = new Vector3(Random.Range(-15, 15), 1, Random.Range(-15, 15));
+            GameObject powerupPrefab = powerupPrefabs[Random.Range(0, GameManager.Instance.powerupPrefabs.Length)];
+            GameObject powerup = Instantiate(powerupPrefab, spawnPosition, Quaternion.identity);
+            powerup.GetComponent<NetworkObject>().Spawn();
+        }
+    }
     public void Update()
     {
         if (IsServer)
@@ -107,5 +120,13 @@ public class GameManager : NetworkBehaviour
         }
         timerTextP1.text = "Player 1 Time: " + timePlayer1.Value.ToString("F2") + "s";
         timerTextP2.text = "Player 2 Time: " + timePlayer2.Value.ToString("F2") + "s";
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            StartCoroutine(SpawnPowerupsRoutine());
+        }
     }
 }
