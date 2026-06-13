@@ -73,12 +73,13 @@ public class LobbyManager : NetworkBehaviour
         SceneManager.LoadScene(0);
     }
 
-    private void OnSceneEvent(SceneEvent sceneEvent)
+    private async void OnSceneEvent(SceneEvent sceneEvent)
     {
         if (sceneEvent.SceneEventType == SceneEventType.LoadComplete && (sceneEvent.SceneName == "Map1" || sceneEvent.SceneName == "Map2"))
         {
             if (NetworkManager.Singleton.IsHost)
             {
+                await Task.Delay(200);
                 GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
                 if (spawnPoints.Length == 0)
                 {
