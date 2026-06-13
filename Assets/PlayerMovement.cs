@@ -18,6 +18,7 @@ public class PlayerMovement : NetworkBehaviour
     public PlayerControls controls;
     public TextMeshProUGUI SpeedUpText;
     public TextMeshProUGUI JumpUpText;
+    public TextMeshProUGUI RoleText;
     private Coroutine speedRoutine;
     private Coroutine jumpRoutine;
     Vector3 velocity;
@@ -35,9 +36,14 @@ public class PlayerMovement : NetworkBehaviour
         {
             SpeedUpText = GameObject.Find("SpeedUpText").GetComponent<TextMeshProUGUI>();
             JumpUpText = GameObject.Find("JumpUpText").GetComponent<TextMeshProUGUI>();
-
+            RoleText = GameObject.Find("RoleText").GetComponent<TextMeshProUGUI>();
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
             SpeedUpText.gameObject.SetActive(false);
             JumpUpText.gameObject.SetActive(false);
+
+            GetComponent<PlayerState>().CurrentRole.OnValueChanged += OnRoleChanged;
+            UpdateRoleUI(GetComponent<PlayerState>().CurrentRole.Value);
         }
 
         if (!IsOwner)
@@ -121,9 +127,9 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
     [ServerRpc]
-    void RequestPowerupDestructionServerRpc(NetworkObjectReference targer)
+    void RequestPowerupDestructionServerRpc(NetworkObjectReference target)
     {
-        if (targer.TryGet(out NetworkObject obj))
+        if (target.TryGet(out NetworkObject obj))
         {
             obj.Despawn();
         }
@@ -156,6 +162,29 @@ public class PlayerMovement : NetworkBehaviour
         jumpRoutine = null;
     }
 
-    
+    private void OnRoleChanged(PlayerState.PlayerRoleEnum previousRole, PlayerState.PlayerRoleEnum newRole)
+    {
+        UpdateRoleUI(newRole);
+    }
+
+    private void UpdateRoleUI(PlayerState.PlayerRoleEnum role)
+    {
+        if (role == PlayerState.PlayerRoleEnum.Hunter)
+        {
+            RoleText.text = "Role: Hunter";
+        }
+        else
+        {
+            RoleText.text = "Role: Prey";
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsOwner && GetComponent<PlayerState>() != null)
+        {
+            GetComponent<PlayerState>().CurrentRole.OnValueChanged -= OnRoleChanged;
+        }
+    }
 
 }

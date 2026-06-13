@@ -9,11 +9,13 @@ using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LobbyManager : NetworkBehaviour
 {
     public TextMeshProUGUI JoinCodeText;
     public TMP_InputField JoinCodeInputField;
+    public TMP_Dropdown MapDropdown;
     public GameObject StartButton;
     public GameObject JoinText;
     public GameObject PlayerPrefab;
@@ -33,7 +35,6 @@ public class LobbyManager : NetworkBehaviour
         StartButton.SetActive(true);
         RelayServerData relayServerData = AllocationUtils.ToRelayServerData(allocation, "dtls");
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-
         NetworkManager.Singleton.StartHost();
         NetworkManager.Singleton.SceneManager.OnSceneEvent += OnSceneEvent;
     }
@@ -62,17 +63,28 @@ public class LobbyManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsHost)
         {
-            NetworkManager.Singleton.SceneManager.LoadScene("Map1", UnityEngine.SceneManagement.LoadSceneMode.Single);
+            string selectedMap = MapDropdown.options[MapDropdown.value].text;
+            NetworkManager.Singleton.SceneManager.LoadScene(selectedMap, UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
+    }
+
+    public void Back()
+    {
+        SceneManager.LoadScene(0);
     }
 
     private void OnSceneEvent(SceneEvent sceneEvent)
     {
-        if (sceneEvent.SceneEventType == SceneEventType.LoadComplete && sceneEvent.SceneName == "Map1")
+        if (sceneEvent.SceneEventType == SceneEventType.LoadComplete && (sceneEvent.SceneName == "Map1" || sceneEvent.SceneName == "Map2"))
         {
             if (NetworkManager.Singleton.IsHost)
             {
                 GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+                if (spawnPoints.Length == 0)
+                {
+                    Debug.LogError("No spawn points found in the scene.");
+                    return;
+                }
                 int index = (int)sceneEvent.ClientId % spawnPoints.Length;
                 Transform selectedSpawn = spawnPoints[index].transform;
                 GameObject playerInstance = Instantiate(PlayerPrefab, selectedSpawn.position, selectedSpawn.rotation);

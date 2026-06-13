@@ -99,9 +99,16 @@ public class GameManager : NetworkBehaviour
         while (true)
         {
             yield return new WaitForSeconds(5f);
-            Vector3 spawnPosition = new Vector3(Random.Range(-15, 15), 1, Random.Range(-15, 15));
-            GameObject powerupPrefab = powerupPrefabs[Random.Range(0, GameManager.Instance.powerupPrefabs.Length)];
-            GameObject powerup = Instantiate(powerupPrefab, spawnPosition, Quaternion.identity);
+            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("PowerupSpawn");
+            if (spawnPoints.Length == 0)
+            {
+                Debug.LogWarning("Brak obiektów z tagiem PowerupSpawn na tej mapie!");
+                continue; 
+            }
+            Transform selectedSpawn = spawnPoints[Random.Range(0, spawnPoints.Length)].transform;
+            Vector3 spawnPosition = selectedSpawn.position;
+            GameObject powerupPrefab = powerupPrefabs[Random.Range(0, powerupPrefabs.Length)];
+            GameObject powerup = Instantiate(powerupPrefab, spawnPosition, selectedSpawn.rotation);
             powerup.GetComponent<NetworkObject>().Spawn();
         }
     }

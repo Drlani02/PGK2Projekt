@@ -1,5 +1,6 @@
 using UnityEngine;
-using TMPro; 
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class EndGameUI : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class EndGameUI : MonoBehaviour
 
     private void Start()
     {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         if (ResultManager.Instance != null)
         {
             winnerTextLabel.text = ResultManager.Instance.WinnerMessage;
@@ -16,4 +19,9 @@ public class EndGameUI : MonoBehaviour
             Debug.LogWarning("Nie znaleziono ResultManagera w scenie końcowej!");
         }
     }
+    public void Back()
+    {
+        SceneManager.LoadScene(0);
+    }
+
 }
