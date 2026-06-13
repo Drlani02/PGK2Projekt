@@ -12,7 +12,7 @@ public class PlayerState : NetworkBehaviour
     }
     public NetworkVariable<float> timeEscaped = new NetworkVariable<float>(0f);
     public NetworkVariable<PlayerRoleEnum> CurrentRole = new NetworkVariable<PlayerRoleEnum>(PlayerRoleEnum.Runner);
-    
+    public NetworkVariable<int> SelectedModelIndex = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     Collider playerCollider;
     public void PlayerCollided(PlayerState otherPlayer)
     {
@@ -41,6 +41,24 @@ public class PlayerState : NetworkBehaviour
         transform.position = newPosition;
 
         if (cc != null) cc.enabled = true;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        SelectedModelIndex.OnValueChanged += (oldVal, newVal) => {
+            GetComponent<PlayerVisuals>().SwitchModel(newVal);
+        };
+        GetComponent<PlayerVisuals>().SwitchModel(SelectedModelIndex.Value);
+        if (IsOwner)
+        {
+            SetCharacterVisualServerRpc(CharacterData.SelectionIndex);
+        }
+    }
+
+    [ServerRpc]
+    public void SetCharacterVisualServerRpc(int index)
+    {
+        SelectedModelIndex.Value = index;
     }
 
     void Start()

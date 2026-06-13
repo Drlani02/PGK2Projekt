@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TetoAnimator
+  m_Controller: {fileID: 9100000, guid: 21a9017f060d2944f809c1fc6fcf2cf2, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: -8945691123924629249, guid: 9d09a739be54b2e40b609cc85689c68f, type: 3}
+    m_OverrideClip: {fileID: -8945691123924629249, guid: 38d10b2550a5df94da28879cb3a46dad, type: 3}
+  - m_OriginalClip: {fileID: 5522812681064789136, guid: 9d09a739be54b2e40b609cc85689c68f, type: 3}
+    m_OverrideClip: {fileID: -7551964380084998518, guid: 38d10b2550a5df94da28879cb3a46dad, type: 3}

@@ -13,6 +13,9 @@ public class PlayerMovement : NetworkBehaviour
     public float gravity;
     public CharacterController controller;
     public Camera cam;
+    public GameObject mikuModel;
+    public GameObject tetoModel;
+    public Animator animator;
     public AudioListener listener;
     public float jumpHeight;
     public PlayerControls controls;
@@ -23,6 +26,7 @@ public class PlayerMovement : NetworkBehaviour
     private Coroutine jumpRoutine;
     Vector3 velocity;
     Vector3 currentMove;
+    public NetworkVariable<int> selectedSkin = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     void Awake()
     {
@@ -41,7 +45,7 @@ public class PlayerMovement : NetworkBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             SpeedUpText.gameObject.SetActive(false);
             JumpUpText.gameObject.SetActive(false);
-
+            selectedSkin.Value = CharacterData.SelectionIndex;
             GetComponent<PlayerState>().CurrentRole.OnValueChanged += OnRoleChanged;
             UpdateRoleUI(GetComponent<PlayerState>().CurrentRole.Value);
         }
@@ -60,6 +64,22 @@ public class PlayerMovement : NetworkBehaviour
     void OnDisable()
     {
         controls.Disable();
+    }
+
+    private void UpdateSkin(int skinIndex)
+    {
+        if (skinIndex == 0)
+        {
+            mikuModel.SetActive(true);
+            tetoModel.SetActive(false);
+            animator = mikuModel.GetComponent<Animator>();
+        }
+        else if (skinIndex == 1)
+        {
+            mikuModel.SetActive(false);
+            tetoModel.SetActive(true);
+            animator = tetoModel.GetComponent<Animator>();
+        }
     }
 
     void Update()
@@ -86,10 +106,12 @@ public class PlayerMovement : NetworkBehaviour
         if (input == Vector2.zero || Vector3.Dot(currentMove, move) < 0)
         {
             currentAccel = deceleration;
+            animator.SetBool("isMoving", false);
         }
         else
         {
             currentAccel = acceleration;
+            animator.SetBool("isMoving", true);
         }
 
         currentMove = Vector3.Lerp(currentMove, move, currentAccel * Time.deltaTime);
